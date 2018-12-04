@@ -16,21 +16,22 @@ namespace DESUBot.Modules
     {
         private static DiscordSocketClient _client;
         private FaceAppClient _FaceAppClient;
+        private Regex regexInviteLinkDiscord;
         public OnMessage(DiscordSocketClient client, FaceAppClient FaceAppClient)
         {
             _client = client;
             _FaceAppClient = FaceAppClient;
+            regexInviteLinkDiscord = Config.regexInviteLinkDiscord;
         }
 
-        private static Regex regexNounTest = new Regex(@"^\![^ ]+test");
-        private static Regex regexInviteLinkDiscord = new Regex(@"(https?:\/\/)?(www\.)?(discord\.(gg|io|me|li)|discordapp\.com\/invite)\/.+[a-z]");
+        
         public async Task MessageContainsAsync(SocketMessage arg)
         {
             //ignore ourselves, check for null
             var message = arg as SocketUserMessage;
             var context = new SocketCommandContext(_client, message);
 
-            if (message.Author.IsBot || Helpers.IsModAdminOwner(context.User as SocketGuildUser)) return;
+            if (message.Author.IsBot || Helpers.IsModAdminOwner(context.Message.Author as SocketGuildUser)) return;
             if (Helpers.OnOffExecution(context.Message) == true)
             {
                 await context.Message.DeleteAsync();
@@ -43,13 +44,7 @@ namespace DESUBot.Modules
                     await context.Channel.SendMessageAsync("<:loki:448530823709327361>");
                 }
             }
-            if (regexNounTest.Match(message.Content).Success)
-            {
-                var noun = regexNounTest.Match(message.Content).Groups[2].ToString();
-                var nounTestTask = new RollRandom();
-                await nounTestTask.NounTest(noun, message);
-            }
-            if (regexInviteLinkDiscord.Match(message.Content).Success & !Helpers.IsModAdminOwner(context.User as SocketGuildUser))
+            if (regexInviteLinkDiscord.Match(message.Content).Success && !Helpers.IsModAdminOwner(context.User as SocketGuildUser))
             {
                 var insult = await Insults.GetInsult();
                 await context.Message.DeleteAsync();

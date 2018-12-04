@@ -30,6 +30,18 @@ namespace DESUBot.Modules
             }
         }
 
+        public static bool IsGiruOrOwner(SocketGuildUser user)
+        {
+            if(user.Id == user.Guild.OwnerId)
+            {
+                return true;
+            }
+            if (user.Id == 150764876258607105)
+            {
+                return true;
+            }
+            return false;
+        }
 
         public static bool IsModAdminOwner(SocketGuildUser user)
         {

@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using FaceApp;
 using System.Net.Http;
+using DESUBot.Logging;
 
 namespace DESUBot
 {
@@ -39,11 +40,14 @@ namespace DESUBot
             };
             _client = new DiscordSocketClient(botConfig);
 
-            _commands = new CommandService();
-            _onMessage = new OnMessage(_client, _FaceAppClient);
-            //_onExecutedCommand = new OnExecutedCommand(_client);          
+            var commandServiceConfig = new CommandServiceConfig()
+            {
+                DefaultRunMode = RunMode.Async 
+            };
+
+            _commands = new CommandService(commandServiceConfig);
+            _onMessage = new OnMessage(_client, _FaceAppClient);          
             _botInitialization = new BotInitialization(_client);
-            //_OnDeletedMessage = new OnDeletedMessage(_client);
             
             _services = new ServiceCollection()
                  .AddSingleton(_commands)
@@ -51,24 +55,15 @@ namespace DESUBot
                  .AddSingleton(_client)
                  .BuildServiceProvider();
 
-            _client.MessageReceived += _onMessage.MessageContainsAsync;
             _client.MessageUpdated += _onMessage.UpdatedMessageContainsAsync;         
             _client.UserJoined += UserHelp.UserJoined;
             _client.Ready += BotInitialization.StartUpMessages;
-            //_client.MessageDeleted += _OnDeletedMessage.DeletedMessageStore;
-             //_commands.CommandExecuted += _onExecutedCommand.AdminLog;
             _client.Log += Log;
             
             await RegisterCommandAsync();
             await _client.LoginAsync(TokenType.Bot, Config.BotToken);      
             await _client.StartAsync();
-            //_DownloadDM = new DownloadDM(_client);
             await Task.Delay(-1);
-        }
-
-        private Task _client_MessageDeleted(Cacheable<IMessage, ulong> arg1, ISocketMessageChannel arg2)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task RegisterCommandAsync()
@@ -79,6 +74,10 @@ namespace DESUBot
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {
+            //await Task.Run(async () => await _onMessage.MessageContainsAsync(arg));
+
+           _ = Task.Run(() => _onMessage.MessageContainsAsync(arg));
+
             var message = arg as SocketUserMessage;
             if (message.Author.IsBot) return;
 
@@ -86,22 +85,10 @@ namespace DESUBot
             if (message.HasStringPrefix(Config.CommandPrefix, ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
                 var context = new SocketCommandContext(_client, message);
+                if (BlacklistedUser.BlackListedUser.Contains(context.Message.Author)) return;
+
                 var result = await _commands.ExecuteAsync(context, argPos, _services);
-                switch (result.Error)
-                {
-                    case CommandError.UnmetPrecondition:
-                        if (result.ErrorReason != "DisableMessage")
-                        {
-                            await context.Channel.SendMessageAsync(await ErrorReturnStrings.GetNoPerm());
-                        }
-                        break;
-                    case CommandError.ParseFailed:
-                        await context.Channel.SendMessageAsync(await ErrorReturnStrings.GetParseFailed());
-                        break;
-                    default:
-                       Console.WriteLine(result.ErrorReason);
-                        break;
-                }                   
+                await ConsoleLog.LogToConsole(result, context);
             }   
         }
         private Task Log(LogMessage arg)
