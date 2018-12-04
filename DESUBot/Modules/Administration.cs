@@ -20,6 +20,7 @@ namespace DESUBot.Modules
         [Command("kick")]
         private async Task KickUser(SocketGuildUser user, [Remainder]string reason = null)
         {
+            if (!await ValidateAdminOrAbove(Context, Context.Message.Author as SocketGuildUser, reason)) return;
             if (!await ValidateAdminOrAbove(Context, user, reason)) return;
 
             await user.KickAsync(reason);
@@ -34,6 +35,7 @@ namespace DESUBot.Modules
         [Command("ban")]
         private async Task BanUser(SocketGuildUser user, [Remainder]string reason)
         {
+            if (!await ValidateAdminOrAbove(Context, Context.Message.Author as SocketGuildUser, reason)) return;
             if (!await ValidateAdminOrAbove(Context, user, reason)) return;
 
             await user.KickAsync(reason);
@@ -46,6 +48,42 @@ namespace DESUBot.Modules
             await Context.Channel.SendMessageAsync("", false, embed.Build());
         }
 
+        [Command("searchban")]
+        private async Task searchBan([Remainder]string input = null)
+        {
+            if (!Helpers.IsAdminOwner(Context.Message.Author as SocketGuildUser)) return;
+
+            if (input == null)
+            {
+                return;
+            }
+
+            var bans = await Context.Guild.GetBansAsync();
+            List<Discord.Rest.RestBan> matchedBans = new List<Discord.Rest.RestBan>(); 
+            foreach (var ban in bans)
+            {          
+                if (ban.User.Username.ToLower().Contains(input.ToLower()))
+                {
+                    matchedBans.Add(ban);
+                }               
+            }
+
+            if (bans.Count == 0 || matchedBans.Count == 0)
+            {
+                await Context.Channel.SendMessageAsync("couldn't find anyone sry owo");
+                return;
+            }
+
+            var bannedUserNames = string.Join("\n", matchedBans.Select(x => x.User.Username).ToArray());
+
+            var embed = new EmbedBuilder();
+            embed.WithTitle($"Banned user names matching \"{input}\" ");
+            embed.AddField("Username", bannedUserNames, true);
+            embed.AddField("User ID: ", string.Join("\n", matchedBans.Select(x => x.User.Id)), true);
+            embed.AddField("Reason for ban: ", string.Join("\n", matchedBans.Select(x => x.Reason)), true);
+            await Context.Channel.SendMessageAsync("", false, embed.Build());
+
+        }
 
         [Command("bancleanse")]
         private async Task BanUserAndClean(SocketGuildUser user, [Remainder]string reason = null)
@@ -61,13 +99,14 @@ namespace DESUBot.Modules
             await Context.Channel.SendMessageAsync("", false, embed.Build());
         }
 
-        bool existingBan;
+        
         string bannedUserName;
         [Command("unban")]
         private async Task UnbanUser(ulong userID)
         {
-            if (!Helpers.IsAdminOwner(Context.Message.Author as SocketGuildUser)) return;           
+            if (!Helpers.IsAdminOwner(Context.Message.Author as SocketGuildUser)) return;
 
+            bool existingBan = false;
             var insult = await Insults.GetInsult();
             var allBans = await Context.Guild.GetBansAsync();
             foreach (var item in allBans)
@@ -77,10 +116,6 @@ namespace DESUBot.Modules
                     existingBan = true;
                     bannedUserName = item.User.Username;
                     break;
-                }
-                else
-                {
-                    existingBan = false;
                 }
             }
 

@@ -125,12 +125,21 @@ namespace DESUBot.Modules
                 await Context.Channel.SendMessageAsync("stop beefing with eachother fucking bastards");
                 return;
             }
-            var embedReplaceRemovedRole = new EmbedBuilder();
-            embedReplaceRemovedRole.WithTitle($"✅   {Context.User.Username} successfully muted {user.Username}");
-            embedReplaceRemovedRole.WithColor(new Color(0, 255, 0));
-            await Context.Channel.SendMessageAsync("", false, embedReplaceRemovedRole.Build());
-            await user.AddRoleAsync(mutedRole);
-            return;
+
+            try
+            {
+                var embedReplaceRemovedRole = new EmbedBuilder();
+                embedReplaceRemovedRole.WithTitle($"✅   {Context.User.Username} successfully muted {user.Username}");
+                embedReplaceRemovedRole.WithColor(new Color(0, 255, 0));
+                await Context.Channel.SendMessageAsync("", false, embedReplaceRemovedRole.Build());
+                await user.AddRoleAsync(mutedRole);
+                return;
+            }
+            catch (Exception)
+            {
+
+                await Context.Channel.SendMessageAsync("i wont do that to them uwu");
+            }
         }
 
         [Command("unmute")]
@@ -157,13 +166,23 @@ namespace DESUBot.Modules
                 await Context.Channel.SendMessageAsync("stop beefing with eachother fucking bastards");
                 return;
             }
-            var embedReplaceRemovedRole = new EmbedBuilder();
-            embedReplaceRemovedRole.WithTitle($"✅   {Context.User.Username} successfully unmuted {user.Username}");
-            embedReplaceRemovedRole.WithColor(new Color(0, 255, 0));
-            await Context.Channel.SendMessageAsync("", false, embedReplaceRemovedRole.Build());
-            await user.RemoveRoleAsync(mutedRole);
-            return;
+
+            try
+            {
+                var embedReplaceRemovedRole = new EmbedBuilder();
+                embedReplaceRemovedRole.WithTitle($"✅   {Context.User.Username} successfully unmuted {user.Username}");
+                embedReplaceRemovedRole.WithColor(new Color(0, 255, 0));
+                await Context.Channel.SendMessageAsync("", false, embedReplaceRemovedRole.Build());
+                await user.RemoveRoleAsync(mutedRole);
+                return;
+            }
+            catch (Exception)
+            {
+
+                await Context.Channel.SendMessageAsync("i wont do that to them uwu");
+            }
         }
+
 
         [Command("cant")]
         private async Task CantPostPics(IGuildUser user)
@@ -188,13 +207,24 @@ namespace DESUBot.Modules
                 await Context.Channel.SendMessageAsync("stop beefing with eachother fucking bastards");
                 return;
             }
-            var embedReplaceRemovedRole = new EmbedBuilder();
-            embedReplaceRemovedRole.WithTitle($"✅   {Context.User.Username} removed the pic perms of {user.Username}");
-            embedReplaceRemovedRole.WithColor(new Color(0, 255, 0));
-            await Context.Channel.SendMessageAsync("", false, embedReplaceRemovedRole.Build());
-            await userSocket.AddRoleAsync(picsRole);
-            return;
+
+            try
+            {
+                var embedReplaceRemovedRole = new EmbedBuilder();
+                embedReplaceRemovedRole.WithTitle($"✅   {Context.User.Username} removed the pic perms of {user.Username}");
+                embedReplaceRemovedRole.WithColor(new Color(0, 255, 0));
+                await Context.Channel.SendMessageAsync("", false, embedReplaceRemovedRole.Build());
+                await userSocket.AddRoleAsync(picsRole);
+                return;
+            }
+            catch (Exception)
+            {
+
+                await Context.Channel.SendMessageAsync("i wont do that to them uwu");
+            }
         }
+
+        
 
         [Command("can")]
         private async Task CanPostPics(IGuildUser user)
@@ -208,8 +238,8 @@ namespace DESUBot.Modules
                 await Context.Channel.SendMessageAsync("cant find cant post pics role !");
                 return;
             }
-            var insult = await Insults.GetInsult();
 
+            var insult = await Insults.GetInsult();
             if (!Helpers.IsRole(UtilityRoles.PicPermDisable, userSocket))
             {
                 await Context.Channel.SendMessageAsync("they can post pics u " + insult);
@@ -220,12 +250,24 @@ namespace DESUBot.Modules
                 await Context.Channel.SendMessageAsync("stop beefing with eachother fucking bastards");
                 return;
             }
-            var embedReplaceRemovedRole = new EmbedBuilder();
-            embedReplaceRemovedRole.WithTitle($"✅   {Context.User.Username} returned pic perms for {user.Username}");
-            embedReplaceRemovedRole.WithColor(new Color(0, 255, 0));
-            await Context.Channel.SendMessageAsync("", false, embedReplaceRemovedRole.Build());
-            await userSocket.RemoveRoleAsync(picsRole);
-            return;
+
+            try
+            {
+               
+                var embedReplaceRemovedRole = new EmbedBuilder();
+                embedReplaceRemovedRole.WithTitle($"✅   {Context.User.Username} returned pic perms for {user.Username}");
+                embedReplaceRemovedRole.WithColor(new Color(0, 255, 0));
+                await Context.Channel.SendMessageAsync("", false, embedReplaceRemovedRole.Build());
+                await userSocket.RemoveRoleAsync(picsRole);
+                return;
+            }
+            catch (Exception)
+            {
+
+               await Context.Channel.SendMessageAsync("i wont do that to them uwu");
+            }
+
+
         }
 
 

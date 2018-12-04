@@ -27,7 +27,7 @@ namespace DESUBot.Modules
             var guildMainChannel = guildUser.Guild.GetChannel(Config.MainChannel);
             var chnl = guildMainChannel as ITextChannel;       
    
-            await guildUser.AddRoleAsync(Helpers.ReturnRole(guildUser.Guild, UtilityRoles.Member));
+           // await guildUser.AddRoleAsync(Helpers.ReturnRole(guildUser.Guild, UtilityRoles.Member));
 
             if (CommandToggles.WelcomeMessages)
             {
@@ -64,13 +64,12 @@ namespace DESUBot.Modules
         }
 
         [Command("bancleanse")]
-        [RequireUserPermission(GuildPermission.ViewAuditLog)]
-        [RequireBotPermission(GuildPermission.BanMembers)]
         private async Task BanUserAndCleanse()
         {
+            if (!Helpers.IsAdminOwner(Context.Message.Author as SocketGuildUser)) return;
             var insult = await Insults.GetInsult();
             var embed = new EmbedBuilder();
-            embed.WithTitle($"Bans & Cleanses a {insult} from this sacred place");
+            embed.WithTitle($"Bans & Cleanses a {insult} from weeb territory");
             embed.WithDescription("**Usage**: .ban \"user\" \"reason\"\n" +
                 "**Target**: arrogant shitters \n" +
                 "**Chat Purge**: 24 hours. \n" +
@@ -79,10 +78,9 @@ namespace DESUBot.Modules
             await Context.Channel.SendMessageAsync("", false, embed.Build());
         }
         [Command("ban")]
-        [RequireUserPermission(GuildPermission.ViewAuditLog)]
-        [RequireBotPermission(GuildPermission.BanMembers)]
         private async Task BanUser()
         {
+            if (!Helpers.IsAdminOwner(Context.Message.Author as SocketGuildUser)) return;
             var insult = await Insults.GetInsult();
             var embed = new EmbedBuilder();
             embed.WithTitle($"Permanently ends some {insult} from weeb territory");

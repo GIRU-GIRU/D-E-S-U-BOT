@@ -297,7 +297,7 @@ namespace DESUBot.Modules
             {
                 try
                 {
-                    var collectionTopMemes = db.Memestore.OrderBy(x => x.MemeUses).Take(10);
+                    var collectionTopMemes = db.Memestore.OrderByDescending(x => x.MemeUses).Take(10);
                     List<string> topMemeAuthors = new List<string>();
                     topMemeAuthors.AddRange(collectionTopMemes.Select(x => x.Author));
 
