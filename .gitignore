@@ -46,3 +46,6 @@ DESUBot/obj/Release/netcoreapp2.0/GIRUBotV3.csprojResolveAssemblyReference.cache
 DESUBot/obj/Release/netcoreapp2.0/GIRUBotV3.dll
 DESUBot/obj/Release/netcoreapp2.0/GIRUBotV3.pdb
 DESUBot/DESUDB.db
+*.db
+DESUBot/desu.ico
+DESUBot/Run.bat
