@@ -11,7 +11,7 @@ namespace DESUBot.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(@"Data Source=F:\DESUBot\D-E-S-U-BOT\DESUBot\DESUDB.db");
+            optionsBuilder.UseSqlite(@"Data Source=C:\Users\Administrator\Documents\GitHub\D E S U\D-E-S-U-BOT\DESUBot\DESUDB.db");
    
             optionsBuilder.EnableSensitiveDataLogging(true);
         }
