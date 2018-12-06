@@ -20,7 +20,7 @@ namespace DESUBot.Models
         }
         public static string Admin
         {
-            get { return "admin"; }
+            get { return "adnim"; }
         }
         public static string Member
         {
