@@ -29,7 +29,7 @@ namespace DESUBot.Modules
             var embed = new EmbedBuilder();
             embed.WithTitle($"{user.Username}{userDiscriminator}");
             embed.AddField("Account Created: ", userCreatedAtString, true);
-            embed.AddField("Joined Melee Slasher: ", userJoinedAtString, true);
+            embed.AddField("Joined D E S U: ", userJoinedAtString, true);
             embed.AddField("User ID: ", user.Id, false);
             embed.AddField("Currently playing ", userActivity, true);
             embed.AddField("Status: ", userStatus, true);
@@ -55,7 +55,7 @@ namespace DESUBot.Modules
             var embed = new EmbedBuilder();
             embed.WithTitle($"{user.Username}{userDiscriminator}");
             embed.AddField("Account Created: ", userCreatedAtString, true);
-            embed.AddField("Joined Melee Slasher: ", userJoinedAtString, true);
+            embed.AddField("Joined D E S U: ", userJoinedAtString, true);
             embed.AddField("User ID: ", user.Id, false);
             embed.AddField("Currently playing ", userActivity, true);
             embed.AddField("Status: ", userStatus, true);

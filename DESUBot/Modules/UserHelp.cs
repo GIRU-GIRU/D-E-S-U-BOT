@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord.Net;
 using DESUBot.Models;
+using System.Linq;
 
 namespace DESUBot.Modules
 {
@@ -55,40 +56,37 @@ namespace DESUBot.Modules
             }
         }
 
-        [Command("say")]
-        [RequireUserPermission(GuildPermission.ViewAuditLog)]
-        private async Task SayInMain([Remainder]string message)
+        [Command("d")]
+        public async Task UserSelfDeleteMessages(int amountToDelete = 0)
         {
-            var chnl = Context.Guild.GetTextChannel(Config.MainChannel);
-            await chnl.SendMessageAsync(message);
+            if (!Helpers.IsRole(UtilityRoles.Delete, Context.Message.Author as SocketGuildUser)) return;
+
+            try
+            {
+                var amount = 100;
+
+                var usersocket = Context.Message.Author as SocketGuildUser;             
+                var msgsCollection = await Context.Channel.GetMessagesAsync(amount).FlattenAsync();
+                var result = from m in msgsCollection
+                             where m.Author == Context.Message.Author
+                             select m.Id;
+
+                var chnl = Context.Channel as ITextChannel;
+                var totalToDelete = amountToDelete == 0 ? result.Take(amount) : result;
+
+                await chnl.DeleteMessagesAsync(totalToDelete);
+                var cleanseUserEmbed = new EmbedBuilder();
+                cleanseUserEmbed.WithTitle($"🗑      {Context.Message.Author.Username} self deleted {totalToDelete.Count()} messages");
+                cleanseUserEmbed.WithColor(new Color(105, 105, 105));
+                await Context.Channel.SendMessageAsync("", false, cleanseUserEmbed.Build());
+            }
+            catch (Exception ex)
+            {
+                await Context.Channel.SendMessageAsync("something went wrong uwu... " + ex.Message);
+            }
+
         }
 
-        [Command("bancleanse")]
-        private async Task BanUserAndCleanse()
-        {
-            if (!Helpers.IsAdminOwner(Context.Message.Author as SocketGuildUser)) return;
-            var insult = await Insults.GetInsult();
-            var embed = new EmbedBuilder();
-            embed.WithTitle($"Bans & Cleanses a {insult} from weeb territory");
-            embed.WithDescription("**Usage**: .ban \"user\" \"reason\"\n" +
-                "**Target**: arrogant shitters \n" +
-                "**Chat Purge**: 24 hours. \n" +
-                "**Ban length:** Indefinite.");
-            embed.WithColor(new Color(0, 255, 0));
-            await Context.Channel.SendMessageAsync("", false, embed.Build());
-        }
-        [Command("ban")]
-        private async Task BanUser()
-        {
-            if (!Helpers.IsAdminOwner(Context.Message.Author as SocketGuildUser)) return;
-            var insult = await Insults.GetInsult();
-            var embed = new EmbedBuilder();
-            embed.WithTitle($"Permanently ends some {insult} from weeb territory");
-            embed.WithDescription("**Usage**: .ban \"user\" \"reason\"\n" +
-                "**Target**: arrogant shitters \n" +
-                "**Length**: Indefinite.");
-            embed.WithColor(new Color(0, 255, 0));
-            await Context.Channel.SendMessageAsync("", false, embed.Build());
-        }
+        
     }
 }

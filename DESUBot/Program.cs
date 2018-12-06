@@ -74,7 +74,6 @@ namespace DESUBot
 
         private async Task HandleCommandAsync(SocketMessage arg)
         {
-            //await Task.Run(async () => await _onMessage.MessageContainsAsync(arg));
 
            _ = Task.Run(() => _onMessage.MessageContainsAsync(arg));
 

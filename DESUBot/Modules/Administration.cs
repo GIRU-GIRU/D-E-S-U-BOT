@@ -22,14 +22,23 @@ namespace DESUBot.Modules
         {
             if (!await ValidateAdminOrAbove(Context, Context.Message.Author as SocketGuildUser, reason)) return;
             if (!await ValidateAdminOrAbove(Context, user, reason)) return;
+            try
+            {
+                var targetUser = user.Nickname;
+                await user.KickAsync(reason);
 
-            await user.KickAsync(reason);
+                var embed = new EmbedBuilder();
+                embed.WithTitle($"✅     {Context.User.Username} booted {targetUser}");
+                embed.WithDescription($"reason: **{reason}**");
+                embed.WithColor(new Color(0, 255, 0));
+                await Context.Channel.SendMessageAsync("", false, embed.Build());
+            }
+            catch (Exception e)
+            {
 
-            var embed = new EmbedBuilder();
-            embed.WithTitle($"✅     {Context.User.Username} _booted_ {user.Nickname}");
-            embed.WithDescription($"reason: **{reason}**");
-            embed.WithColor(new Color(0, 255, 0));
-            await Context.Channel.SendMessageAsync("", false, embed.Build());
+                await Context.Channel.SendMessageAsync("uhhh wouldnt let me ... " + e.Message);
+            }
+
         }
 
         [Command("ban")]
@@ -38,14 +47,21 @@ namespace DESUBot.Modules
             if (!await ValidateAdminOrAbove(Context, Context.Message.Author as SocketGuildUser, reason)) return;
             if (!await ValidateAdminOrAbove(Context, user, reason)) return;
 
-            await user.KickAsync(reason);
-            await user.Guild.AddBanAsync(user, 0, reason);
+            try
+            {
+                var targetUser = user.Nickname;
+                await user.Guild.AddBanAsync(user, 0, reason);
 
-            var embed = new EmbedBuilder();
-            embed.WithTitle($"✅     {Context.User.Username} banned {user.Nickname}");
-            embed.WithDescription($"reason: _{reason}_");
-            embed.WithColor(new Color(0, 255, 0));
-            await Context.Channel.SendMessageAsync("", false, embed.Build());
+                var embed = new EmbedBuilder();
+                embed.WithTitle($"✅     {Context.User.Username} banned {targetUser}");
+                embed.WithDescription($"reason: _{reason}_");
+                embed.WithColor(new Color(0, 255, 0));
+                await Context.Channel.SendMessageAsync("", false, embed.Build());
+            }
+            catch (Exception e)
+            {
+                await Context.Channel.SendMessageAsync("uhhh wouldnt let me ... " + e.Message);
+            }
         }
 
         [Command("searchban")]
@@ -88,17 +104,25 @@ namespace DESUBot.Modules
         [Command("bancleanse")]
         private async Task BanUserAndClean(SocketGuildUser user, [Remainder]string reason = null)
         {
+            if (!await ValidateAdminOrAbove(Context, Context.Message.Author as SocketGuildUser, reason)) return;
             if (!await ValidateAdminOrAbove(Context, user, reason)) return;
 
-            await user.Guild.AddBanAsync(user, 1, reason);
+            try
+            {
+                await user.Guild.AddBanAsync(user, 1, reason);
 
-            var embed = new EmbedBuilder();
-            embed.WithTitle($"✅     {Context.User.Username} banned & cleansed  {user.Nickname}");
-            embed.WithDescription($"reason: _{reason}_");
-            embed.WithColor(new Color(0, 255, 0));
-            await Context.Channel.SendMessageAsync("", false, embed.Build());
+                var embed = new EmbedBuilder();
+                embed.WithTitle($"✅     {Context.User.Username} banned & cleansed  {user.Nickname}");
+                embed.WithDescription($"reason: _{reason}_");
+                embed.WithColor(new Color(0, 255, 0));
+                await Context.Channel.SendMessageAsync("", false, embed.Build());
+            }
+            catch (Exception e)
+            {
+                await Context.Channel.SendMessageAsync("uhhh wouldnt let me ... " + e.Message);
+            }
+ 
         }
-
         
         string bannedUserName;
         [Command("unban")]
@@ -123,8 +147,17 @@ namespace DESUBot.Modules
             {
                 await Context.Channel.SendMessageAsync("that's not a valid ID " + insult);
             }
-            await Context.Guild.RemoveBanAsync(userID);
-            await Context.Channel.SendMessageAsync($"✅    *** {bannedUserName} has been unbanned ***");
+
+            try
+            {
+                await Context.Guild.RemoveBanAsync(userID);
+                await Context.Channel.SendMessageAsync($"✅    *** {bannedUserName} has been unbanned ***");
+            }
+            catch (Exception e)
+            {
+                await Context.Channel.SendMessageAsync("uhhh wouldnt let me ... " + e.Message);
+            }
+           
         }
 
         [Command("warn")]
@@ -163,13 +196,12 @@ namespace DESUBot.Modules
             }
         }
 
-        string currentName;
         [Command("name")]
         private async Task SetNick(SocketGuildUser user, [Remainder]string newName = null)
         {
             if (!Helpers.IsModAdminOwner(Context.Message.Author as SocketGuildUser)) return;
 
-            currentName = user.Nickname;
+            var currentName = user.Nickname;
             if (string.IsNullOrEmpty(user.Nickname))
             {
                 currentName = user.Username;
@@ -182,6 +214,7 @@ namespace DESUBot.Modules
             embedReplaceRemovedRole.WithColor(new Color(0, 255, 0));
             await Context.Channel.SendMessageAsync("", false, embedReplaceRemovedRole.Build());
         }
+
         [Command("resetname")]
         private async Task SetNick(SocketGuildUser user)
         {
@@ -250,6 +283,44 @@ namespace DESUBot.Modules
                 return true;
             }
             return false;
+        }
+
+
+
+        [Command("say")]
+        [RequireUserPermission(GuildPermission.ViewAuditLog)]
+        private async Task SayInMain([Remainder]string message)
+        {
+            var chnl = Context.Guild.GetTextChannel(Config.MainChannel);
+            await chnl.SendMessageAsync(message);
+        }
+
+        [Command("bancleanse")]
+        private async Task BanUserAndCleanse()
+        {
+            if (!Helpers.IsAdminOwner(Context.Message.Author as SocketGuildUser)) return;
+            var insult = await Insults.GetInsult();
+            var embed = new EmbedBuilder();
+            embed.WithTitle($"Bans & Cleanses a {insult} from weeb territory");
+            embed.WithDescription("**Usage**: .ban \"user\" \"reason\"\n" +
+                "**Target**: arrogant shitters \n" +
+                "**Chat Purge**: 24 hours. \n" +
+                "**Ban length:** Indefinite.");
+            embed.WithColor(new Color(0, 255, 0));
+            await Context.Channel.SendMessageAsync("", false, embed.Build());
+        }
+        [Command("ban")]
+        private async Task BanUser()
+        {
+            if (!Helpers.IsAdminOwner(Context.Message.Author as SocketGuildUser)) return;
+            var insult = await Insults.GetInsult();
+            var embed = new EmbedBuilder();
+            embed.WithTitle($"Permanently ends some {insult} from weeb territory");
+            embed.WithDescription("**Usage**: .ban \"user\" \"reason\"\n" +
+                "**Target**: arrogant shitters \n" +
+                "**Length**: Indefinite.");
+            embed.WithColor(new Color(0, 255, 0));
+            await Context.Channel.SendMessageAsync("", false, embed.Build());
         }
     }
 }

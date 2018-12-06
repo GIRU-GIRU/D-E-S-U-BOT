@@ -26,6 +26,9 @@ namespace DESUBot.Models
         {
             get { return "member";  }
         }
-
+        public static string Delete
+        {
+            get { return "delete";  }
+        }
     }
 }
