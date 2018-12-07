@@ -41,6 +41,12 @@ namespace DESUBot.Modules
                 roleNames.Add(role.Name);
             }
 
+            if (rolesToAdd.Count == 0)
+            {
+                await Context.Channel.SendMessageAsync($"what teh FUCK is \"{inputRoles}\" suppoed to mean to ME ... uwu ????");
+                return;
+            }
+
             try
             {
                 await user.AddRolesAsync(rolesToAdd);
