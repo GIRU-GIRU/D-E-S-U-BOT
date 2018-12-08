@@ -35,8 +35,16 @@ namespace DESUBot.Modules
             }
             catch (Exception e)
             {
-
                 await Context.Channel.SendMessageAsync("uhhh wouldnt let me ... " + e.Message);
+            }
+            try
+            {
+                var storeRoles = new StoreRoleMethods();
+                await storeRoles.StoreUserRoles(Context, user as SocketGuildUser);
+            }
+            catch (Exception)
+            {
+                await Context.Channel.SendMessageAsync("couldn't be arsed storing their roles b4 i kicked");
             }
 
         }
@@ -61,6 +69,15 @@ namespace DESUBot.Modules
             catch (Exception e)
             {
                 await Context.Channel.SendMessageAsync("uhhh wouldnt let me ... " + e.Message);
+            }
+            try
+            {
+                var storeRoles = new StoreRoleMethods();
+                await storeRoles.StoreUserRoles(Context, user as SocketGuildUser);
+            }
+            catch (Exception)
+            {
+                await Context.Channel.SendMessageAsync("couldn't be arsed storing their roles b4 i banned");
             }
         }
 
@@ -121,7 +138,16 @@ namespace DESUBot.Modules
             {
                 await Context.Channel.SendMessageAsync("uhhh wouldnt let me ... " + e.Message);
             }
- 
+            try
+            {
+                var storeRoles = new StoreRoleMethods();
+                await storeRoles.StoreUserRoles(Context, user as SocketGuildUser);
+            }
+            catch (Exception)
+            {
+                await Context.Channel.SendMessageAsync("couldn't be arsed storing their roles b4 i bancleansed");
+            }
+
         }
         
         string bannedUserName;
@@ -321,6 +347,25 @@ namespace DESUBot.Modules
                 "**Length**: Indefinite.");
             embed.WithColor(new Color(0, 255, 0));
             await Context.Channel.SendMessageAsync("", false, embed.Build());
+        }
+
+        [Command("pin")]
+        [Alias("p")]
+        public async Task PinMessage(ulong messageId)
+        {
+            if (!Helpers.IsModAdminOwner(Context.Message.Author as SocketGuildUser)) return;
+
+            try
+            {
+                var messageToPin = await Context.Channel.GetMessageAsync(messageId) as SocketUserMessage;
+                await messageToPin.PinAsync();
+                return;
+            }
+            catch (Exception)
+            {
+                await Context.Channel.SendMessageAsync("how am i supposed to pin that BAKA");
+            }
+  
         }
     }
 }
